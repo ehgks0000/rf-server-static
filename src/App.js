@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import './App.css';
+import ScrollToTopButton from './Scroll';
 
 const NULL_IMG = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJyzSuyVDOxsxBU8lxl7O6jGWiHkhMhZ5y_W5IhBmI7oFIfIEOtBZxTCbXUNjMyCuCe_k&usqp=CAU";
 const SERVER_URL = "https://aws.rcloset.biz/api/v1/post/public";
-
 function Post({ id, post }) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -84,8 +84,9 @@ function Post({ id, post }) {
 }
 
 function App() {
-  const [posts, setPosts] = useState([]);
+    const [posts, setPosts] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    
 
     const loadPosts = useCallback(async () => {
         setIsLoading(true);
@@ -129,7 +130,9 @@ function App() {
                 />
             ))}
             {isLoading && <p>Loading more posts...</p>}
+            <ScrollToTopButton />
         </div>
+        
     );
 }
 
