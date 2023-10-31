@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
-import { throttle } from "lodash";
 import "./App.css";
 import ScrollToTopButton from "./Scroll";
 import ChannelService from "./ChannelService";
@@ -7,6 +6,47 @@ import ChannelService from "./ChannelService";
 const NULL_IMG = process.env.REACT_APP_NULL_IMG;
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 const CHANEEL_TALK_KEY = process.env.REACT_APP_CHANEEL_TALK_KEY;
+
+function Modal({ setFilter, toggleModal }) {
+  const handleClick = (sex) => {
+    setFilter(sex);
+    toggleModal();
+  };
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        backgroundColor: "#d9d9d9",
+        padding: "20px",
+        zIndex: 2,
+      }}
+      onClick={(e) => e.stopPropagation()} // 모달 내 클릭이 버블링되지 않도록 합니다.
+    >
+      <button
+        style={{ border: 0, marginRight: "10px" }}
+        onClick={() => handleClick("All")}
+      >
+        All
+      </button>
+      <button
+        style={{ border: 0, marginRight: "10px" }}
+        onClick={() => handleClick("Male")}
+      >
+        Male
+      </button>
+      <button
+        style={{ border: 0, marginRight: "10px" }}
+        onClick={() => handleClick("Female")}
+      >
+        Female
+      </button>
+    </div>
+  );
+}
 function Post({ id, post }) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -88,7 +128,9 @@ function Post({ id, post }) {
           }}
         />
       </div>
-      <div style={{ display: "flex", justifyContent: "center" }}>
+      <div
+        style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}
+      >
         {post.images.map((_, index) => (
           <div
             key={index}
@@ -109,13 +151,29 @@ function Post({ id, post }) {
 function App() {
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [filter, setFilter] = useState("All");
   const loader = useRef();
+
+  const closeModal = () => {
+    if (!showModal) return;
+    setShowModal(() => false);
+  };
+
+  const toggleModal = (e) => {
+    e.stopPropagation();
+    setShowModal((prev) => !prev);
+  };
 
   const loadPosts = useCallback(async () => {
     setIsLoading(true);
-    const response = await fetch(SERVER_URL);
+    let url = SERVER_URL;
+    if (filter !== "All") {
+      url += `?sex=${filter}`;
+    }
+    const response = await fetch(url);
     const data = await response.json();
-    console.log("data :", data);
+    console.log("load");
 
     setPosts((prevPosts) => [...prevPosts, ...data.posts]);
     // const newPosts = data.posts.filter(
@@ -161,8 +219,22 @@ function App() {
   });
 
   return (
-    <div>
+    <div onClick={closeModal}>
       <h1>Posts</h1>
+      <button
+        onClick={toggleModal}
+        style={{
+          position: "fixed",
+          right: "20px", // 오른쪽에서 20px 떨어진 곳에 위치
+          top: "20px", // 위쪽에서 20px 떨어진 곳에 위치
+          zIndex: 1, // 다른 요소 위에 나타나게 하기 위해 z-index 지정
+          border: 0,
+        }}
+      >
+        Filter
+      </button>
+
+      {showModal && <Modal setFilter={setFilter} />}
       {posts.map((post, index) => (
         <div id={`post-${index}`} key={`post-${post.id}-${index}`}>
           <Post
