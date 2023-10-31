@@ -3,7 +3,7 @@ import "./App.css";
 import ScrollToTopButton from "./Scroll";
 import ChannelService from "./ChannelService";
 
-const NULL_IMG = process.env.REACT_APP_NULL_IMG;
+const NULL_IMG = "null.jpg";
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 const CHANEEL_TALK_KEY = process.env.REACT_APP_CHANEEL_TALK_KEY;
 
@@ -61,30 +61,73 @@ function Post({ id, post }) {
   };
 
   return (
-    <div>
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <h2 style={{ marginRight: "20px" }}>{post.user.name}</h2>
-        <img
-          src={post.user.profile.avartar || NULL_IMG}
-          alt={`${post.user.name}'s avatar`}
-          style={{
-            width: "100px",
-            height: "100px",
-            borderRadius: "50%",
-            border: "1px solid #d9d9d9",
-          }}
-        />
-      </div>
-
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
       <div
         style={{
           position: "relative",
-          height: "600px",
+          width: "600px",
+          height: "auto",
+          // height: "600px",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          padding: "60px 0", // 600px의 10%는 60px
+          backgroundColor: "grey", // 여백 부분을 회색으로 설정
+          border: "solid",
+          borderColor: "black",
         }}
       >
+        <div
+          style={{
+            width: "100%",
+            // width: "600px",
+            height: "auto",
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <img
+            src={post.images[currentIndex]?.url || NULL_IMG}
+            alt={post.images[currentIndex]?.url || NULL_IMG}
+            style={{
+              width: "600px",
+              // height: "600px",
+              height: "auto",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              right: 0,
+              display: "flex",
+              alignItems: "center",
+              // padding: "60px 0", // 600px의 10%는 60px
+              // backgroundColor: "grey", // 여백 부분을 회색으로 설정
+            }}
+          >
+            <h2 style={{ marginRight: "20px" }}>{post.user.name}</h2>
+            <img
+              src={post.user.profile.avartar || NULL_IMG}
+              alt={`${post.user.name}'s avatar`}
+              style={{
+                width: "100px",
+                height: "100px",
+                borderRadius: "50%",
+                border: "1px solid #d9d9d9",
+              }}
+            />
+          </div>
+        </div>
+        {/* User name and avatar */}
+
         <button
           onClick={handlePrevClick}
           style={{
@@ -118,31 +161,28 @@ function Post({ id, post }) {
         >
           {" "}
         </button>
-
-        <img
-          src={post.images[currentIndex]?.url || NULL_IMG}
-          alt={post.images[currentIndex]?.url || NULL_IMG}
+        <div
           style={{
-            width: "600px",
-            height: "600px",
+            position: "absolute",
+            bottom: "20px", // Adjust this value to give more or less margin
+            display: "flex",
+            justifyContent: "center",
+            width: "100%",
           }}
-        />
-      </div>
-      <div
-        style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}
-      >
-        {post.images.map((_, index) => (
-          <div
-            key={index}
-            style={{
-              width: "15px",
-              height: "15px",
-              borderRadius: "50%",
-              backgroundColor: currentIndex === index ? "black" : "grey",
-              margin: "0 5px",
-            }}
-          ></div>
-        ))}
+        >
+          {post.images.map((_, index) => (
+            <div
+              key={index}
+              style={{
+                width: "15px",
+                height: "15px",
+                borderRadius: "50%",
+                backgroundColor: currentIndex === index ? "black" : "grey",
+                margin: "0 5px",
+              }}
+            ></div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -219,7 +259,7 @@ function App() {
   }, [loadPosts, isLoading]);
 
   return (
-    <div onClick={closeModal}>
+    <div onClick={closeModal} style={{ minWidth: "600px" }}>
       <h1>Posts</h1>
       <button
         onClick={(e) => toggleModal(e)}
