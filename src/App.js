@@ -8,9 +8,9 @@ const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 const CHANEEL_TALK_KEY = process.env.REACT_APP_CHANEEL_TALK_KEY;
 
 function Modal({ setFilter, toggleModal }) {
-  const handleClick = (sex) => {
+  const handleClick = (e, sex) => {
     setFilter(sex);
-    toggleModal();
+    toggleModal(e);
   };
 
   return (
@@ -28,19 +28,19 @@ function Modal({ setFilter, toggleModal }) {
     >
       <button
         style={{ border: 0, marginRight: "10px" }}
-        onClick={() => handleClick("All")}
+        onClick={(e) => handleClick(e, "All")}
       >
         All
       </button>
       <button
         style={{ border: 0, marginRight: "10px" }}
-        onClick={() => handleClick("Male")}
+        onClick={(e) => handleClick(e, "Male")}
       >
         Male
       </button>
       <button
         style={{ border: 0, marginRight: "10px" }}
-        onClick={() => handleClick("Female")}
+        onClick={(e) => handleClick(e, "Female")}
       >
         Female
       </button>
@@ -155,7 +155,8 @@ function App() {
   const [filter, setFilter] = useState("All");
   const loader = useRef();
 
-  const closeModal = () => {
+  const closeModal = (e) => {
+    e.stopPropagation();
     if (!showModal) return;
     setShowModal(() => false);
   };
@@ -222,7 +223,7 @@ function App() {
     <div onClick={closeModal}>
       <h1>Posts</h1>
       <button
-        onClick={toggleModal}
+        onClick={(e) => toggleModal(e)}
         style={{
           position: "fixed",
           right: "20px", // 오른쪽에서 20px 떨어진 곳에 위치
@@ -234,7 +235,7 @@ function App() {
         Filter
       </button>
 
-      {showModal && <Modal setFilter={setFilter} />}
+      {showModal && <Modal setFilter={setFilter} toggleModal={toggleModal} />}
       {posts.map((post, index) => (
         <div id={`post-${index}`} key={`post-${post.id}-${index}`}>
           <Post
