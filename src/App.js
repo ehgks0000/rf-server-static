@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { throttle } from "lodash";
 import "./App.css";
 import ScrollToTopButton from "./Scroll";
@@ -109,6 +109,7 @@ function Post({ id, post }) {
 function App() {
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const loader = useRef();
 
   const loadPosts = useCallback(async () => {
     setIsLoading(true);
@@ -129,18 +130,30 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const handleScroll = throttle(async () => {
-      if (
-        window.innerHeight + window.scrollY + 1 >=
-          document.documentElement.scrollHeight * 0.7 &&
-        !isLoading
-      ) {
-        await loadPosts();
-      }
-    }, 1_000);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (
+            entry.isIntersecting &&
+            !isLoading &&
+            entry.target.id === `post-${posts.length - 7}`
+          ) {
+            loadPosts();
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    posts.forEach((post, index) => {
+      const targetId = `post-${index}`;
+      const target = document.getElementById(targetId);
+      if (target) {
+        observer.observe(target);
+      }
+    });
+
+    return () => observer.disconnect();
   }, [loadPosts, isLoading]);
 
   ChannelService.boot({
@@ -151,15 +164,16 @@ function App() {
     <div>
       <h1>Posts</h1>
       {posts.map((post, index) => (
-        <Post
-          key={`${post.id}-${index}`}
-          id={post.id}
-          post={post}
-          // name={post.name}
-          // avatar={post.profile.avartar}
-        />
+        <div id={`post-${index}`} key={`post-${post.id}-${index}`}>
+          <Post
+            key={`${post.id}-${index}-${new Date().getTime()}`}
+            id={post.id}
+            post={post}
+          />
+        </div>
       ))}
       {isLoading && <p>Loading more posts...</p>}
+      <div ref={loader}></div>
       <ScrollToTopButton />
     </div>
   );
