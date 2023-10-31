@@ -186,6 +186,9 @@ function App() {
 
   useEffect(() => {
     loadPosts();
+    ChannelService.boot({
+      pluginKey: CHANEEL_TALK_KEY,
+    });
   }, []);
 
   useEffect(() => {
@@ -214,10 +217,6 @@ function App() {
 
     return () => observer.disconnect();
   }, [loadPosts, isLoading]);
-
-  ChannelService.boot({
-    pluginKey: CHANEEL_TALK_KEY,
-  });
 
   return (
     <div onClick={closeModal}>
