@@ -177,7 +177,7 @@ function Post({ id, post }) {
                 width: "15px",
                 height: "15px",
                 borderRadius: "50%",
-                backgroundColor: currentIndex === index ? "black" : "grey",
+                backgroundColor: currentIndex === index ? "black" : "#d9d9d9",
                 margin: "0 5px",
               }}
             ></div>
