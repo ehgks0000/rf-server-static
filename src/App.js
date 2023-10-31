@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { throttle } from 'lodash';
 import './App.css';
 import ScrollToTopButton from './Scroll';
 
@@ -107,11 +108,11 @@ function App() {
     }, []);
 
     useEffect(() => {
-        const handleScroll = () => {
-            if (window.innerHeight + window.scrollY + 1 >= document.documentElement.scrollHeight && !isLoading) {
-                loadPosts();
+        const handleScroll = throttle(async () => {
+            if (window.innerHeight + window.scrollY + 1 >= document.documentElement.scrollHeight * 0.7 && !isLoading) {
+                await loadPosts();
             }
-        };
+        }, 1_000);
 
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
