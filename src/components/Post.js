@@ -1,7 +1,33 @@
-import {useState} from "react";
+import {useState, useRef} from "react";
 import { NULL_IMG } from "../const";
 export function Post({ id, post }) {
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [startX, setStartX] = useState(null);
+    const [offsetX, setOffsetX] = useState(0);
+    const containerRef = useRef(null);
+
+    const handleMouseDown = (e) => {
+      if (post.images.length < 2) return;
+      setStartX(e.clientX);
+    };
+
+    const handleMouseMove = (e) => {
+      if (post.images.length < 2 || startX === null) return;
+      const diffX = e.clientX - startX;
+      setOffsetX(diffX);
+    };
+
+    const handleMouseUp = () => {
+      if (post.images.length < 2) return;
+      const width = containerRef.current.offsetWidth;
+      if (offsetX > width / 3) {
+        setCurrentIndex((currentIndex - 1 + post.images.length) % post.images.length);
+      } else if (offsetX < -width / 3) {
+        setCurrentIndex((currentIndex + 1) % post.images.length);
+      }
+      setOffsetX(0);
+      setStartX(null);
+    };
   
     return (
       <div
@@ -25,7 +51,7 @@ export function Post({ id, post }) {
             borderColor: "black",
           }}
         >
-          <PostContainer post={post} currentIndex={currentIndex}>
+          <PostContainer post={post} currentIndex={currentIndex} handleMouseDown={handleMouseDown} handleMouseMove={handleMouseMove} handleMouseUp={handleMouseUp}>
               <Avatar post={post} />
           </PostContainer>
           <HandlePostClick setCurrentIndex={setCurrentIndex} post={post} />
@@ -34,8 +60,9 @@ export function Post({ id, post }) {
       </div>
     );
   
-      function PostContainer({post, currentIndex, children}) {
+      function PostContainer({post, currentIndex, handleMouseDown, handleMouseMove, handleMouseUp, children}) {
           return <div
+              ref={containerRef}
               style={{
                   width: "100%",
                   // width: "600px",
@@ -43,16 +70,44 @@ export function Post({ id, post }) {
                   position: "relative",
                   display: "flex",
                   alignItems: "center",
+                  overflow: "hidden"
               }}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
           >
-              <img
+            {
+              post.images.map((image, index) => {
+                return <img 
+                  src={image.url}
+                  alt=""
+                  draggable="false"
+                  style={{
+                    transform: `translateX(calc(${index - currentIndex}00% + ${offsetX}px))`,
+                    transition: startX !== null ? "none" : "transform 0.3s",
+                    position: index === currentIndex ? "relative" : "absolute",
+                    left: 0,
+                    width: "100%",
+                  }}
+                />
+              })
+            }
+              {/* <img
                   src={post.images[currentIndex]?.url || NULL_IMG}
                   alt={post.images[currentIndex]?.url || NULL_IMG}
+                  // onMouseDown={handleMouseDown}
+                  // onMouseMove={handleMouseMove}
+                  // onMouseUp={handleMouseUp}
+                  draggable="false"
                   style={{
                       width: "100%",
                       // height: "600px",
                       height: "auto",
-                  }} />
+                      userSelect: "none",
+                      transform: `translateX(${offsetX}px)`,
+                      transition: startX !== null ? "none" : "transform 0.3s",
+                  }} /> */}
               {children}
           </div>;
       }
