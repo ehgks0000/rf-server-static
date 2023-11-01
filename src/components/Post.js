@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { NULL_IMG } from "../const";
 export function Post({ post }) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -6,6 +6,29 @@ export function Post({ post }) {
   const [offsetX, setOffsetX] = useState(0);
   const [maxHeight, setMaxHeight] = useState(0);
   const containerRef = useRef(null);
+
+  const handleResize = () => {
+    if (containerRef.current) {
+      const images = containerRef.current.getElementsByTagName("img");
+      let newMaxHeight = 0;
+      for (let image of images) {
+        const height = image.offsetHeight;
+        if (height > newMaxHeight) {
+          newMaxHeight = height;
+        }
+      }
+      setMaxHeight(newMaxHeight);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("resize", handleResize);
+
+    // 컴포넌트가 언마운트 될 때 이벤트 리스너를 제거
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const handleImageLoad = (event) => {
     const height = event.target.offsetHeight;
@@ -17,6 +40,7 @@ export function Post({ post }) {
   const handleMouseDown = (e) => {
     if (post.images.length < 2) return;
     setStartX(e.clientX);
+    console.log("maxHeight :", maxHeight);
   };
 
   const handleMouseMove = (event) => {
@@ -63,6 +87,7 @@ export function Post({ post }) {
         style={{
           position: "relative",
           width: "50vw", // 브라우저 가로길이 50퍼센트
+          minWidth: "400px",
           height: "auto",
           display: "flex",
           alignItems: "flex-start",
@@ -102,7 +127,9 @@ export function Post({ post }) {
         style={{
           width: "100%",
           // width: "600px",
+          // minWidth: "400px",
           height: `${maxHeight}px`,
+          // maxHeight: "100%",
           // height: "auto",
           position: "relative",
           display: "flex",
@@ -139,6 +166,7 @@ export function Post({ post }) {
                 position: index === currentIndex ? "relative" : "absolute",
                 left: 0,
                 width: "100%",
+                // maxHeight: "100%",
                 userSelect: "none",
               }}
             />
