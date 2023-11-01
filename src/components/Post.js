@@ -54,6 +54,7 @@ export function Post({ post }) {
     <div
       style={{
         display: "flex",
+        flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
       }}
@@ -64,14 +65,15 @@ export function Post({ post }) {
           width: "50vw", // 브라우저 가로길이 50퍼센트
           height: "auto",
           display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "60px 0", // 600px의 10%는 60px
+          alignItems: "flex-start",
+          justifyContent: "flex-start",
+          // padding: "60px 0", // 600px의 10%는 60px
           backgroundColor: "grey", // 여백 부분을 회색으로 설정
           border: "solid",
           borderColor: "black",
         }}
       >
+        <Avatar post={post} />
         <PostContainer
           post={post}
           currentIndex={currentIndex}
@@ -79,9 +81,7 @@ export function Post({ post }) {
           handleMouseMove={handleMouseMove}
           handleMouseUp={handleMouseUp}
           handleMouseLeave={handleMouseUp}
-        >
-          <Avatar post={post} />
-        </PostContainer>
+        ></PostContainer>
         <HandlePostClick setCurrentIndex={setCurrentIndex} post={post} />
         <PostIndexHole post={post} currentIndex={currentIndex} />
       </div>
@@ -106,7 +106,7 @@ export function Post({ post }) {
           // height: "auto",
           position: "relative",
           display: "flex",
-          alignItems: "center",
+          alignItems: "flex-start",
           overflow: "hidden",
         }}
         onMouseDown={handleMouseDown}
@@ -159,6 +159,7 @@ function Avatar({ post }) {
         right: 0,
         display: "flex",
         alignItems: "center",
+        zIndex: 1,
         // padding: "60px 0", // 600px의 10%는 60px
         // backgroundColor: "grey", // 여백 부분을 회색으로 설정
       }}
