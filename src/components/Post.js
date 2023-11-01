@@ -1,7 +1,5 @@
 import {useState} from "react";
 import { NULL_IMG } from "../const";
-
-// const NULL_IMG = "null.jpg";
 export function Post({ id, post }) {
     const [currentIndex, setCurrentIndex] = useState(0);
   
