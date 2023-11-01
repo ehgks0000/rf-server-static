@@ -126,7 +126,7 @@ export function Post({ post }) {
           ) {
             positionIndex = post.images.length;
           }
-
+          if (!image?.url) return <></>;
           return (
             <img
               src={image.url}
