@@ -1,34 +1,47 @@
 import {useState, useRef} from "react";
 import { NULL_IMG } from "../const";
-export function Post({ id, post }) {
+export function Post({ post }) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [startX, setStartX] = useState(null);
     const [offsetX, setOffsetX] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
     const containerRef = useRef(null);
 
     const handleMouseDown = (e) => {
       if (post.images.length < 2) return;
       setStartX(e.clientX);
+      setIsDragging(true);
     };
 
-    const handleMouseMove = (e) => {
-      if (post.images.length < 2 || startX === null) return;
-      const diffX = e.clientX - startX;
-      setOffsetX(diffX);
-    };
-
-    const handleMouseUp = () => {
-      if (post.images.length < 2) return;
-      const width = containerRef.current.offsetWidth;
-      if (offsetX > width / 3) {
-        setCurrentIndex((currentIndex - 1 + post.images.length) % post.images.length);
-      } else if (offsetX < -width / 3) {
-        setCurrentIndex((currentIndex + 1) % post.images.length);
-      }
-      setOffsetX(0);
-      setStartX(null);
+    const handleMouseMove = (event) => {
+      if (!isDragging) return;
+      if (startX === null) return;
+  
+      const newOffsetX = event.clientX - startX;
+      setOffsetX(newOffsetX);
     };
   
+    const handleMouseUp = () => {
+      setIsDragging(false);
+      if (Math.abs(offsetX) > 50) {
+        if (offsetX > 0) {
+          setCurrentIndex(currentIndex === 0 ? post.images.length - 1 : currentIndex - 1);
+        } else {
+          setCurrentIndex(currentIndex === post.images.length - 1 ? 0 : currentIndex + 1);
+        }
+      } else {
+        // 위치를 원래대로 복구
+        if (currentIndex === 0) {
+          setCurrentIndex(post.images.length - 1);
+        } else if (currentIndex === post.images.length - 1) {
+          setCurrentIndex(0);
+        }
+      }
+    
+      setStartX(null);
+      setOffsetX(0);
+    };
+
     return (
       <div
         style={{
@@ -51,7 +64,7 @@ export function Post({ id, post }) {
             borderColor: "black",
           }}
         >
-          <PostContainer post={post} currentIndex={currentIndex} handleMouseDown={handleMouseDown} handleMouseMove={handleMouseMove} handleMouseUp={handleMouseUp}>
+          <PostContainer post={post} currentIndex={currentIndex} handleMouseDown={handleMouseDown} handleMouseMove={handleMouseMove} handleMouseUp={handleMouseUp} handleMouseLeave={handleMouseUp}>
               <Avatar post={post} />
           </PostContainer>
           <HandlePostClick setCurrentIndex={setCurrentIndex} post={post} />
@@ -60,7 +73,7 @@ export function Post({ id, post }) {
       </div>
     );
   
-      function PostContainer({post, currentIndex, handleMouseDown, handleMouseMove, handleMouseUp, children}) {
+      function PostContainer({isDraggingLeft, post, currentIndex, handleMouseLeave, handleMouseDown, handleMouseMove, handleMouseUp, children}) {
           return <div
               ref={containerRef}
               style={{
@@ -75,39 +88,30 @@ export function Post({ id, post }) {
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
+              // onMouseLeave={handleMouseLeave}
           >
             {
-              post.images.map((image, index) => {
+              [post.images[post.images.length - 1], ...post.images, post.images[0]].map((image, index) => {
+                let positionIndex = index - (currentIndex + 1);
+                if (currentIndex === post.images.length - 1 && offsetX < 0 && index === 0) {
+                  positionIndex = post.images.length;
+                }
+
                 return <img 
                   src={image.url}
                   alt=""
                   draggable="false"
                   style={{
-                    transform: `translateX(calc(${index - currentIndex}00% + ${offsetX}px))`,
-                    transition: startX !== null ? "none" : "transform 0.3s",
+                    transform: `translateX(calc(${positionIndex}00% + ${offsetX}px))`,
+                    transition: startX !== null ? 'none' : undefined, // 드래그하는 동안 transition을 none으로 설정
                     position: index === currentIndex ? "relative" : "absolute",
                     left: 0,
                     width: "100%",
+                    userSelect: "none"
                   }}
                 />
               })
             }
-              {/* <img
-                  src={post.images[currentIndex]?.url || NULL_IMG}
-                  alt={post.images[currentIndex]?.url || NULL_IMG}
-                  // onMouseDown={handleMouseDown}
-                  // onMouseMove={handleMouseMove}
-                  // onMouseUp={handleMouseUp}
-                  draggable="false"
-                  style={{
-                      width: "100%",
-                      // height: "600px",
-                      height: "auto",
-                      userSelect: "none",
-                      transform: `translateX(${offsetX}px)`,
-                      transition: startX !== null ? "none" : "transform 0.3s",
-                  }} /> */}
               {children}
           </div>;
       }
