@@ -4,17 +4,22 @@ export function Post({ post }) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [startX, setStartX] = useState(null);
     const [offsetX, setOffsetX] = useState(0);
-    const [isDragging, setIsDragging] = useState(false);
+    const [maxHeight, setMaxHeight] = useState(0);
     const containerRef = useRef(null);
+
+    const handleImageLoad = (event) => {
+      const height = event.target.offsetHeight;
+      if (height > maxHeight) {
+        setMaxHeight(height);
+      }
+    };
 
     const handleMouseDown = (e) => {
       if (post.images.length < 2) return;
       setStartX(e.clientX);
-      setIsDragging(true);
     };
 
     const handleMouseMove = (event) => {
-      if (!isDragging) return;
       if (startX === null) return;
   
       const newOffsetX = event.clientX - startX;
@@ -22,7 +27,6 @@ export function Post({ post }) {
     };
   
     const handleMouseUp = () => {
-      setIsDragging(false);
       if (Math.abs(offsetX) > 50) {
         if (offsetX > 0) {
           setCurrentIndex(currentIndex === 0 ? post.images.length - 1 : currentIndex - 1);
@@ -79,7 +83,8 @@ export function Post({ post }) {
               style={{
                   width: "100%",
                   // width: "600px",
-                  height: "auto",
+                  height: `${maxHeight}px`,
+                  // height: "auto",
                   position: "relative",
                   display: "flex",
                   alignItems: "center",
@@ -88,7 +93,6 @@ export function Post({ post }) {
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
-              // onMouseLeave={handleMouseLeave}
           >
             {
               [post.images[post.images.length - 1], ...post.images, post.images[0]].map((image, index) => {
@@ -99,6 +103,7 @@ export function Post({ post }) {
 
                 return <img 
                   src={image.url}
+                  onLoad={handleImageLoad}
                   alt=""
                   draggable="false"
                   style={{
