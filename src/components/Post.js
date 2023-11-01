@@ -32,6 +32,7 @@ export function Post({ post }) {
 
   const handleImageLoad = (event) => {
     const height = event.target.offsetHeight;
+    if (!height) return 600;
     if (height > maxHeight) {
       setMaxHeight(height);
     }
@@ -40,7 +41,6 @@ export function Post({ post }) {
   const handleMouseDown = (e) => {
     if (post.images.length < 2) return;
     setStartX(e.clientX);
-    console.log("maxHeight :", maxHeight);
   };
 
   const handleMouseMove = (event) => {
@@ -87,7 +87,7 @@ export function Post({ post }) {
         style={{
           position: "relative",
           width: "50vw", // 브라우저 가로길이 50퍼센트
-          minWidth: "400px",
+          minWidth: "200px",
           height: "auto",
           display: "flex",
           alignItems: "flex-start",
@@ -126,11 +126,7 @@ export function Post({ post }) {
         ref={containerRef}
         style={{
           width: "100%",
-          // width: "600px",
-          // minWidth: "400px",
           height: `${maxHeight}px`,
-          // maxHeight: "100%",
-          // height: "auto",
           position: "relative",
           display: "flex",
           alignItems: "flex-start",
@@ -156,6 +152,7 @@ export function Post({ post }) {
           if (!image?.url) return <></>;
           return (
             <img
+              key={`${index}-${new Date().getTime()}`}
               src={image.url}
               onLoad={handleImageLoad}
               alt=""
@@ -166,6 +163,7 @@ export function Post({ post }) {
                 position: index === currentIndex ? "relative" : "absolute",
                 left: 0,
                 width: "100%",
+                // minHeight: "600px",
                 // maxHeight: "100%",
                 userSelect: "none",
               }}
@@ -187,22 +185,37 @@ function Avatar({ post }) {
         right: 0,
         display: "flex",
         alignItems: "center",
+        justifyContent: "flex-end",
         zIndex: 1,
-        // padding: "60px 0", // 600px의 10%는 60px
-        // backgroundColor: "grey", // 여백 부분을 회색으로 설정
+        width: "20%", // 상위 컴포넌트 가로 길이의 5분의 1
+        maxWidth: "300px", // 컨테이너의 최대 너비 설정
+        minWidth: "50px", // 컨테이너의 최대 너비 설정
       }}
     >
-      <h2 style={{ marginRight: "20px" }}>{post.user.name}</h2>
-      <img
-        src={post.user.profile.avartar || NULL_IMG}
-        alt={`${post.user.name}'s avatar`}
-        style={{
-          width: "100px",
-          height: "100px",
-          borderRadius: "50%",
-          border: "1px solid #d9d9d9",
-        }}
-      />
+      <div style={{ flex: 2 }}>
+        {post.user.name}
+        {/* <h2 style={{ fontSize: "clamp(1rem, 5vw, 2rem)" }}>{}</h2> */}
+      </div>
+
+      <div style={{ flex: 1 }}>{/* 여기에 원하는 내용을 추가하세요. */}</div>
+
+      <div style={{ flex: 2 }}>
+        <div
+          style={{ width: "100%", paddingBottom: "100%", position: "relative" }}
+        >
+          <img
+            src={post.user.profile.avatar || NULL_IMG}
+            alt={`${post.user.name}'s avatar`}
+            style={{
+              position: "absolute",
+              width: "100%",
+              height: "100%",
+              borderRadius: "50%",
+              objectFit: "cover",
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 }

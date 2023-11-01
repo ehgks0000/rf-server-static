@@ -3,7 +3,7 @@ import "./App.css";
 import ScrollToTopButton from "./Scroll";
 import ChannelService from "./ChannelService";
 import { Post, FilterButton, Modal } from "./components";
-import {SERVER_URL, CHANEEL_TALK_KEY} from "./const";
+import { SERVER_URL, CHANEEL_TALK_KEY } from "./const";
 
 function App() {
   const [posts, setPosts] = useState([]);
@@ -79,7 +79,11 @@ function App() {
     <div onClick={closeModal} style={{ minWidth: "400px" }}>
       <h1>RandomCloset</h1>
       <FilterButton toggleModal={toggleModal} />
-      <Modal showModal={showModal} setFilter={setFilter} toggleModal={toggleModal} />
+      <Modal
+        showModal={showModal}
+        setFilter={setFilter}
+        toggleModal={toggleModal}
+      />
       {posts.map((post, index) => (
         <div id={`post-${index}`} key={`post-${post.id}-${index}`}>
           <Post
