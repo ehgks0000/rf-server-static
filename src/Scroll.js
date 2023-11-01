@@ -1,15 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import "./App.css";
 
 function ScrollToTopButton() {
   const [isVisible, setIsVisible] = useState(false);
 
   // 스크롤 위치에 따라 버튼의 가시성을 토글하는 함수
   const toggleVisibility = () => {
-    if (window.pageYOffset > 300) {
-      setIsVisible(true);
+    if (window.scrollY > 300) {
+      if (!isVisible) {
+        setIsVisible(true);
+      }
     } else {
-      setIsVisible(false);
+      if (isVisible) {
+        setIsVisible(false);
+      }
     }
   };
 
@@ -17,7 +21,7 @@ function ScrollToTopButton() {
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
-      behavior: "smooth"
+      behavior: "smooth",
     });
   };
 
@@ -40,21 +44,21 @@ function ScrollToTopButton() {
 // 버튼 스타일링을 위한 CSS 객체
 const styles = {
   scrollButton: {
-    position: 'fixed',
-    bottom: '20px',
-    right: '20px',
-    width: '60px',
-    height: '60px',
-    backgroundColor: '#3498db',
-    borderRadius: '50%',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    fontSize: '2em',
-    color: '#fff',
-    cursor: 'pointer',
+    position: "fixed",
+    bottom: "20px",
+    right: "20px",
+    width: "60px",
+    height: "60px",
+    backgroundColor: "#3498db",
+    borderRadius: "50%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    fontSize: "2em",
+    color: "#fff",
+    cursor: "pointer",
     zIndex: 1000,
-  }
+  },
 };
 
 export default ScrollToTopButton;

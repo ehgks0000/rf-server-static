@@ -4,6 +4,7 @@ import ScrollToTopButton from "./Scroll";
 import ChannelService from "./ChannelService";
 import { Post, FilterButton, Modal } from "./components";
 import { SERVER_URL, CHANEEL_TALK_KEY } from "./const";
+import { nanoid } from "nanoid";
 
 function App() {
   const [posts, setPosts] = useState([]);
@@ -33,7 +34,13 @@ function App() {
     const data = await response.json();
     console.log("load");
 
-    setPosts((prevPosts) => [...prevPosts, ...data.posts]);
+    // 새로운 포스트에만 nanoid 적용
+    const newPosts = data.posts.map((post) => ({
+      ...post,
+      key: nanoid(),
+    }));
+
+    setPosts((prevPosts) => [...prevPosts, ...newPosts]);
     // const newPosts = data.posts.filter(
     //   newData => !posts.some(existingData => existingData.id === newData.id)
     // );
@@ -64,7 +71,7 @@ function App() {
       { threshold: 0.1 }
     );
 
-    posts.forEach((post, index) => {
+    posts.forEach((_, index) => {
       const targetId = `post-${index}`;
       const target = document.getElementById(targetId);
       if (target) {
@@ -73,7 +80,7 @@ function App() {
     });
 
     return () => observer.disconnect();
-  }, [loadPosts, isLoading]);
+  }, [loadPosts, isLoading, posts]);
 
   return (
     <div onClick={closeModal} style={{ minWidth: "400px" }}>
@@ -85,12 +92,8 @@ function App() {
         toggleModal={toggleModal}
       />
       {posts.map((post, index) => (
-        <div id={`post-${index}`} key={`post-${post.id}-${index}`}>
-          <Post
-            key={`${post.id}-${index}-${new Date().getTime()}`}
-            id={post.id}
-            post={post}
-          />
+        <div id={`post-${index}`} key={post.key}>
+          <Post id={post.id} post={post} />
         </div>
       ))}
       {isLoading && <p>Loading more posts...</p>}

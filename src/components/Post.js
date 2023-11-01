@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { NULL_IMG } from "../const";
+import { nanoid } from "nanoid";
 export function Post({ post }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [startX, setStartX] = useState(null);
@@ -81,6 +82,7 @@ export function Post({ post }) {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
+        overflowAnchor: "none",
       }}
     >
       <div
@@ -96,6 +98,7 @@ export function Post({ post }) {
           backgroundColor: "grey", // 여백 부분을 회색으로 설정
           border: "solid",
           borderColor: "black",
+          overflowAnchor: "none",
         }}
       >
         <Avatar post={post} />
@@ -123,6 +126,7 @@ export function Post({ post }) {
   }) {
     return (
       <div
+        key={nanoid()}
         ref={containerRef}
         style={{
           width: "100%",
@@ -131,6 +135,7 @@ export function Post({ post }) {
           display: "flex",
           alignItems: "flex-start",
           overflow: "hidden",
+          overflowAnchor: "none",
         }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -152,7 +157,7 @@ export function Post({ post }) {
           if (!image?.url) return <></>;
           return (
             <img
-              key={`${index}-${new Date().getTime()}`}
+              key={`${index}-${nanoid()}`}
               src={image.url}
               onLoad={handleImageLoad}
               alt=""
@@ -282,7 +287,7 @@ function PostIndexHole({ post, currentIndex }) {
     >
       {post.images.map((_, index) => (
         <div
-          key={index}
+          key={`${index}-${nanoid()}`}
           style={{
             width: "15px",
             height: "15px",
