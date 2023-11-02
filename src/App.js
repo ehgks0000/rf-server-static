@@ -83,7 +83,7 @@ function App() {
   }, [loadPosts, isLoading, posts]);
 
   return (
-    <div onClick={closeModal} style={{ minWidth: "400px" }}>
+    <div onClick={closeModal} >
       <h1>RandomCloset</h1>
       <FilterButton toggleModal={toggleModal} />
       <Modal

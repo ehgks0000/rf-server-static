@@ -75,6 +75,9 @@ export function Post({ post }) {
     setOffsetX(0);
   };
 
+  const isModile = window.innerWidth <= 600;
+  const width = isModile ? '100vw' : "50vw";
+
   return (
     <div
       style={{
@@ -88,8 +91,9 @@ export function Post({ post }) {
       <div
         style={{
           position: "relative",
-          width: "50vw", // 브라우저 가로길이 50퍼센트
-          minWidth: "200px",
+          width: width, // 브라우저 가로길이 50퍼센트
+          // width: "50vw", // 브라우저 가로길이 50퍼센트
+          // minWidth: "200px",
           height: "auto",
           display: "flex",
           alignItems: "flex-start",
