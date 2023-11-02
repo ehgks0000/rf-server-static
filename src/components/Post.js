@@ -4,6 +4,7 @@ import { nanoid } from "nanoid";
 export function Post({ post }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [startX, setStartX] = useState(null);
+  const [touchedX, setTouchedX] = useState(null);
   const [offsetX, setOffsetX] = useState(0);
   const [maxHeight, setMaxHeight] = useState(0);
   const containerRef = useRef(null);
@@ -75,8 +76,52 @@ export function Post({ post }) {
     setOffsetX(0);
   };
 
-  const isModile = window.innerWidth <= 600;
-  const width = isModile ? '100vw' : "50vw";
+  const handleTouchStart = (e) => {
+    console.log("터치중? :", e.target);
+    e.stopPropagation();
+    if (post.images.length < 2) return;
+    setStartX(e.touches[0].clientX);
+    // setTouchedX(e.touches[0].clientX);
+  };
+  
+  const handleTouchMove = (e) => {
+    e.stopPropagation();
+    console.log("터치중? 무브?", e.target)
+    if (touchedX === null) return;
+    
+    console.log("e.touches[0].clientX :", e.touches[0].clientX);
+    console.log("touchedX :", touchedX);
+    const newOffsetX = e.touches[0].clientX - touchedX;
+    setOffsetX(newOffsetX);
+    setStartX(e.touches[0].clientX);  // 이 부분을 수정하였습니다.
+    // setOffsetX(newOffsetX);
+    // setTouchedX(e.touches[0].clientX);  // 이 부분을 수정하였습니다.
+  };
+  
+  const handleTouchEnd = (e) => {
+    e.stopPropagation();
+    console.log("handleTouchEnd");
+    if (Math.abs(offsetX) > 50) {
+      if (offsetX > 0) {
+        setCurrentIndex(
+          currentIndex === 0 ? post.images.length - 1 : currentIndex - 1
+        );
+      } else {
+        setCurrentIndex(
+          currentIndex === post.images.length - 1 ? 0 : currentIndex + 1
+        );
+      }
+    }
+  
+    setStartX(null);
+    // setTouchedX(null);
+    setOffsetX(0);
+  };
+  
+
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(window.navigator.userAgent);
+  // const isModile = window.innerWidth <= 600;
+  const width = isMobile ? '100vw' : "50vw";
 
   return (
     <div
@@ -107,12 +152,16 @@ export function Post({ post }) {
       >
         <Avatar post={post} />
         <PostContainer
+          isMobile={isMobile}
           post={post}
           currentIndex={currentIndex}
           handleMouseDown={handleMouseDown}
           handleMouseMove={handleMouseMove}
           handleMouseUp={handleMouseUp}
           handleMouseLeave={handleMouseUp}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
         ></PostContainer>
         <HandlePostClick setCurrentIndex={setCurrentIndex} post={post} />
         <PostIndexHole post={post} currentIndex={currentIndex} />
@@ -121,11 +170,15 @@ export function Post({ post }) {
   );
 
   function PostContainer({
+    isMobile,
     post,
     currentIndex,
     handleMouseDown,
     handleMouseMove,
     handleMouseUp,
+    onTouchStart,
+    onTouchMove,
+    onTouchEnd,
     children,
   }) {
     return (
@@ -140,10 +193,14 @@ export function Post({ post }) {
           alignItems: "flex-start",
           overflow: "hidden",
           overflowAnchor: "none",
+          // zIndex: 1
         }}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
+        onMouseDown={isMobile ? undefined : handleMouseDown}
+        onMouseMove={isMobile ? undefined : handleMouseMove}
+        onMouseUp={isMobile ? undefined : handleMouseUp}
+        onTouchStart={isMobile ? onTouchStart : undefined}
+        onTouchMove={isMobile ? onTouchMove : undefined}
+        onTouchEnd={isMobile ? onTouchEnd : undefined}
       >
         {[
           post.images[post.images.length - 1],
@@ -287,6 +344,7 @@ function PostIndexHole({ post, currentIndex }) {
         display: "flex",
         justifyContent: "center",
         width: "100%",
+        zIndex: 1
       }}
     >
       {post.images.map((_, index) => (

@@ -91,11 +91,15 @@ function App() {
         setFilter={setFilter}
         toggleModal={toggleModal}
       />
-      {posts.map((post, index) => (
-        <div id={`post-${index}`} key={post.key}>
-          <Post id={post.id} post={post} />
-        </div>
-      ))}
+      {posts.map((post, index) => {
+        if(!post) return <></>
+        return (
+          <div id={`post-${index}`} key={post.key}>
+            <Post id={post.id} post={post} />
+          </div>
+        )
+      }
+      )}
       {isLoading && <p>Loading more posts...</p>}
       <div ref={loader}></div>
       <ScrollToTopButton />
