@@ -5,6 +5,7 @@ import ChannelService from "./ChannelService";
 import { Post, FilterButton, Modal } from "./components";
 import { SERVER_URL, CHANEEL_TALK_KEY } from "./const";
 import { nanoid } from "nanoid";
+import { NavBar } from "./components/Nav";
 
 function App() {
   const [posts, setPosts] = useState([]);
@@ -12,6 +13,28 @@ function App() {
   const [showModal, setShowModal] = useState(false);
   const [filter, setFilter] = useState("All");
   const loader = useRef();
+  // const parentRef = useRef(null);
+  // 너비 상태를 설정합니다.
+  // const [parentWidth, setParentWidth] = useState(0);
+
+  // useEffect(() => {
+  //   // 너비를 업데이트하는 함수입니다.
+  //   function updateWidth() {
+  //     // console.log("updateWidth");
+  //     if (parentRef.current) {
+  //       setParentWidth(parentRef.current.offsetWidth);
+  //     }
+  //   }
+
+  //   // 처음 컴포넌트가 마운트될 때 너비를 설정합니다.
+  //   updateWidth();
+
+  //   // 윈도우 리사이즈 이벤트에 함수를 바인딩합니다.
+  //   window.addEventListener("resize", updateWidth);
+
+  //   // 컴포넌트가 언마운트될 때 이벤트 리스너를 정리합니다.
+  //   return () => window.removeEventListener("resize", updateWidth);
+  // }, []);
 
   const closeModal = (e) => {
     e.stopPropagation();
@@ -82,27 +105,47 @@ function App() {
     return () => observer.disconnect();
   }, [loadPosts, isLoading, posts]);
 
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(window.navigator.userAgent);
+  const width = isMobile ? "100vw" : "50vw";
+  // console.log("parent width :", width);
+
   return (
-    <div onClick={closeModal} >
+    <div
+      onClick={closeModal}
+      style={{
+        display: "flex",
+        flexDirection: "column", // 세로 방향으로 나열
+        justifyContent: "flex-start", // 가로축에서 중앙 정렬
+        alignItems: "center", // 세로축에서 중앙 정렬
+        height: "100vh", // 부모 div의 높이를 뷰포트의 100%로 설정
+      }}
+    >
       <h1>RandomCloset</h1>
-      <FilterButton toggleModal={toggleModal} />
-      <Modal
-        showModal={showModal}
-        setFilter={setFilter}
-        toggleModal={toggleModal}
-      />
-      {posts.map((post, index) => {
-        if(!post) return <></>
-        return (
-          <div id={`post-${index}`} key={post.key}>
-            <Post id={post.id} post={post} />
-          </div>
-        )
-      }
-      )}
-      {isLoading && <p>Loading more posts...</p>}
-      <div ref={loader}></div>
-      <ScrollToTopButton />
+      <div
+        // ref={parentRef}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          width: `${width}`,
+        }}
+      >
+        <FilterButton toggleModal={toggleModal} />
+        <Modal
+          showModal={showModal}
+          setFilter={setFilter}
+          toggleModal={toggleModal}
+        />
+        {posts.map((post, index) => {
+          if (!post) return <></>;
+          return <Post id={post.id} post={post} key={post.key} />;
+        })}
+        {isLoading && <p>Loading more posts...</p>}
+        <div ref={loader}></div>
+        <ScrollToTopButton />
+      </div>
+      <NavBar parentWidth={width} />
     </div>
   );
 }

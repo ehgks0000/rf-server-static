@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { NULL_IMG } from "../const";
 import { nanoid } from "nanoid";
-export function Post({ post }) {
+export function Post({ post, key }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [startX, setStartX] = useState(null);
   const [touchedX, setTouchedX] = useState(null);
@@ -83,21 +83,21 @@ export function Post({ post }) {
     setStartX(e.touches[0].clientX);
     // setTouchedX(e.touches[0].clientX);
   };
-  
+
   const handleTouchMove = (e) => {
     e.stopPropagation();
-    console.log("터치중? 무브?", e.target)
+    console.log("터치중? 무브?", e.target);
     if (touchedX === null) return;
-    
-    console.log("e.touches[0].clientX :", e.touches[0].clientX);
-    console.log("touchedX :", touchedX);
+
+    // console.log("e.touches[0].clientX :", e.touches[0].clientX);
+    // console.log("touchedX :", touchedX);
     const newOffsetX = e.touches[0].clientX - touchedX;
     setOffsetX(newOffsetX);
-    setStartX(e.touches[0].clientX);  // 이 부분을 수정하였습니다.
+    setStartX(e.touches[0].clientX); // 이 부분을 수정하였습니다.
     // setOffsetX(newOffsetX);
     // setTouchedX(e.touches[0].clientX);  // 이 부분을 수정하였습니다.
   };
-  
+
   const handleTouchEnd = (e) => {
     e.stopPropagation();
     console.log("handleTouchEnd");
@@ -112,38 +112,34 @@ export function Post({ post }) {
         );
       }
     }
-  
+
     setStartX(null);
     // setTouchedX(null);
     setOffsetX(0);
   };
-  
 
   const isMobile = /iPhone|iPad|iPod|Android/i.test(window.navigator.userAgent);
-  // const isModile = window.innerWidth <= 600;
-  const width = isMobile ? '100vw' : "50vw";
 
   return (
     <div
+      key={key}
       style={{
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
         overflowAnchor: "none",
+        width: "100%",
       }}
     >
       <div
         style={{
           position: "relative",
-          width: width, // 브라우저 가로길이 50퍼센트
-          // width: "50vw", // 브라우저 가로길이 50퍼센트
-          // minWidth: "200px",
+          width: "100%",
           height: "auto",
           display: "flex",
           alignItems: "flex-start",
           justifyContent: "flex-start",
-          // padding: "60px 0", // 600px의 10%는 60px
           backgroundColor: "grey", // 여백 부분을 회색으로 설정
           border: "solid",
           borderColor: "black",
@@ -344,7 +340,7 @@ function PostIndexHole({ post, currentIndex }) {
         display: "flex",
         justifyContent: "center",
         width: "100%",
-        zIndex: 1
+        zIndex: 1,
       }}
     >
       {post.images.map((_, index) => (
