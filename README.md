@@ -2,7 +2,7 @@
 
 랜덤 클로젯 랜딩 페이지
 
-[링크](static.rcloset.biz)
+[링크](https://static.rcloset.biz)
 
 # 사용 스택
 
