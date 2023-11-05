@@ -163,6 +163,102 @@ export function Post({ post, id, key }) {
         <HandlePostClick setCurrentIndex={setCurrentIndex} post={post} />
         <PostIndexHole post={post} currentIndex={currentIndex} />
       </div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          width: "100%",
+          height: "4vw",
+          whiteSpace: "nowrap",
+          border: "solid",
+          // fontSize: "calc(1vw + 0.5rem)",
+          fontSize: "1vw",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            flex: 0,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              flex: 1,
+              marginRight: "10px",
+              border: "solid",
+            }}
+          >
+            하트 0
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flex: 1,
+              border: "solid",
+            }}
+          >
+            사진모아보기
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            flex: 1,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              border: "solid",
+              // marginLeft: "10px",
+            }}
+          >
+            공유
+          </div>
+          <div
+            style={{
+              display: "flex",
+              marginLeft: "10px",
+              border: "solid",
+            }}
+          >
+            스크랩
+          </div>
+          <div
+            style={{
+              display: "flex",
+              marginLeft: "10px",
+              border: "solid",
+            }}
+          >
+            ...
+          </div>
+        </div>
+      </div>
+
+      <div
+        style={{
+          width: "100%",
+          height: "100px",
+          border: "solid",
+        }}
+      >
+        <div
+          style={{
+            marginTop: "10px",
+            marginLeft: "10px",
+          }}
+        >
+          댓글
+        </div>
+      </div>
     </div>
   );
 

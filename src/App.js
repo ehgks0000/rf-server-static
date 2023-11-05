@@ -106,7 +106,7 @@ function App() {
   }, [loadPosts, isLoading, posts]);
 
   const isMobile = /iPhone|iPad|iPod|Android/i.test(window.navigator.userAgent);
-  const width = isMobile ? "100vw" : "50vw";
+  const width = isMobile ? "100vw" : "20vw";
   // console.log("parent width :", width);
 
   return (
