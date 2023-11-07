@@ -1,6 +1,141 @@
 import { useState, useRef, useEffect } from "react";
 import { NULL_IMG } from "../const";
 import { nanoid } from "nanoid";
+
+const url = "https://aws.rcloset.biz/api/v1/post"
+function PostAction({id, favoriteCount}) {
+  const [count, setCount] = useState(favoriteCount);
+
+  const handleFavoriteClick = async () => {
+    try {
+      const u = `${url}/${id}/favorite`;
+      console.log("handleFavoriteClick :", u);
+      const res = await fetch(u, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+      if(!res.ok){
+        throw new Error(res.status)
+        // console.error("Failed post");
+        // return
+      }
+      console.log("res :", res);
+      const data = await res.json();
+      console.log("data :", data);
+      setCount((prev) => prev + 1);
+    } catch (error) {
+      console.error("error :", error);
+    }
+  }
+
+  return (
+    <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          width: "100%",
+          height: "4vw",
+          whiteSpace: "nowrap",
+          border: "solid",
+          // fontSize: "calc(1vw + 0.5rem)",
+          fontSize: "1vw",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            flex: 0,
+          }}
+        >
+          {/* <button onClick={handleFavoriteClick}>btn</button> */}
+          <div
+            style={{
+              display: "flex",
+              flex: 1,
+              marginRight: "10px",
+              border: "solid",
+            }}
+            onClick={handleFavoriteClick}
+          >
+            하트 {count}
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flex: 1,
+              border: "solid",
+            }}
+          >
+            사진모아보기
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            flex: 1,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              border: "solid",
+              // marginLeft: "10px",
+            }}
+          >
+            공유
+          </div>
+          <div
+            style={{
+              display: "flex",
+              marginLeft: "10px",
+              border: "solid",
+            }}
+          >
+            스크랩
+          </div>
+          <div
+            style={{
+              display: "flex",
+              marginLeft: "10px",
+              border: "solid",
+            }}
+          >
+            ...
+          </div>
+        </div>
+      </div>
+  )
+}
+
+function Comment() {
+  return (
+    <div
+        style={{
+          width: "100%",
+          height: "100px",
+          border: "solid",
+        }}
+      >
+        <div
+          style={{
+            marginTop: "10px",
+            marginLeft: "10px",
+          }}
+        >
+          댓글
+        </div>
+      </div>
+  )
+}
+
 export function Post({ post, id, key }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [startX, setStartX] = useState(null);
@@ -120,6 +255,7 @@ export function Post({ post, id, key }) {
 
   const isMobile = /iPhone|iPad|iPod|Android/i.test(window.navigator.userAgent);
 
+  // console.log("post :", post._count.favorites);
   return (
     <div
       id={id}
@@ -163,102 +299,8 @@ export function Post({ post, id, key }) {
         <HandlePostClick setCurrentIndex={setCurrentIndex} post={post} />
         <PostIndexHole post={post} currentIndex={currentIndex} />
       </div>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          width: "100%",
-          height: "4vw",
-          whiteSpace: "nowrap",
-          border: "solid",
-          // fontSize: "calc(1vw + 0.5rem)",
-          fontSize: "1vw",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "flex-start",
-            flex: 0,
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              flex: 1,
-              marginRight: "10px",
-              border: "solid",
-            }}
-          >
-            하트 0
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flex: 1,
-              border: "solid",
-            }}
-          >
-            사진모아보기
-          </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "flex-end",
-            flex: 1,
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              border: "solid",
-              // marginLeft: "10px",
-            }}
-          >
-            공유
-          </div>
-          <div
-            style={{
-              display: "flex",
-              marginLeft: "10px",
-              border: "solid",
-            }}
-          >
-            스크랩
-          </div>
-          <div
-            style={{
-              display: "flex",
-              marginLeft: "10px",
-              border: "solid",
-            }}
-          >
-            ...
-          </div>
-        </div>
-      </div>
-
-      <div
-        style={{
-          width: "100%",
-          height: "100px",
-          border: "solid",
-        }}
-      >
-        <div
-          style={{
-            marginTop: "10px",
-            marginLeft: "10px",
-          }}
-        >
-          댓글
-        </div>
-      </div>
+      <PostAction id={post.id} favoriteCount={post._count.favorites} />
+      <Comment />
     </div>
   );
 

@@ -1,4 +1,12 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  RouterProvider,
+  createBrowserRouter,
+} from "react-router-dom";
+import { LoginSuccess, LoginFail } from "./components";
 import "./App.css";
 import ScrollToTopButton from "./Scroll";
 import ChannelService from "./ChannelService";
@@ -7,34 +15,82 @@ import { SERVER_URL, CHANEEL_TALK_KEY } from "./const";
 import { nanoid } from "nanoid";
 import { NavBar } from "./components/Nav";
 
-function App() {
+const BASE_URL = "https://aws.rcloset.biz/api/v1/auth";
+
+function LogoutButton() {
+  const handleLogout = async () => {
+    const res = await fetch(BASE_URL + '/logout', {
+      method: 'GET',
+      credentials: "include"
+    });
+
+    if(!res.ok){
+      throw new Error(res.status);
+    }
+    console.log("로그아웃");
+    // window.location.href = "";
+  };
+
+  return (
+    <button onClick={handleLogout}>Logout</button>
+  );
+}
+
+function MainLayout() {
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [filter, setFilter] = useState("All");
+  const [popup, setPopup] = useState();
   const loader = useRef();
-  // const parentRef = useRef(null);
-  // 너비 상태를 설정합니다.
-  // const [parentWidth, setParentWidth] = useState(0);
 
-  // useEffect(() => {
-  //   // 너비를 업데이트하는 함수입니다.
-  //   function updateWidth() {
-  //     // console.log("updateWidth");
-  //     if (parentRef.current) {
-  //       setParentWidth(parentRef.current.offsetWidth);
-  //     }
-  //   }
+  const handleCheckLogin = async (e) => {
+    e.preventDefault();
+    const res = await fetch("https://aws.rcloset.biz/api/v1/user/me", {
+      method: "GET",
+      credentials: "include",
+    });
+    const data = await res.json();
+    console.log("data :", data);
+  };
+  const handlePopupClick = (e, url) => {
+    e.preventDefault();
 
-  //   // 처음 컴포넌트가 마운트될 때 너비를 설정합니다.
-  //   updateWidth();
+    const popup = window.open(
+      BASE_URL + "/" + url,
+      "로그인중..", // 새 탭 또는 새 창으로 열립니다.
+      "width=800,height=600,left=200,top=200"
+    );
 
-  //   // 윈도우 리사이즈 이벤트에 함수를 바인딩합니다.
-  //   window.addEventListener("resize", updateWidth);
+    setPopup(popup);
+  };
+  useEffect(() => {
+    if (!popup) return;
+    function handleLoginMessage(event) {
+      // 메시지가 올바른 출처에서 온 것인지 확인
+      if (event.origin !== window.location.origin) {
+        return; // 또는 자신의 앱에 맞는 출처를 설정
+      }
+      console.log("event.data :", event.data);
+      if (event.data === "loginSuccess") {
+        // 로그인 성공 처리
+        console.log("로그인 성공!");
+        // 상태 업데이트 또는 페이지 리디렉션 등의 로직을 여기에 추가
+      }
+      popup?.close();
+      setPopup(null);
+    }
 
-  //   // 컴포넌트가 언마운트될 때 이벤트 리스너를 정리합니다.
-  //   return () => window.removeEventListener("resize", updateWidth);
-  // }, []);
+    // 메시지 리스너를 추가
+    window.addEventListener("message", handleLoginMessage, false);
+
+    // 컴포넌트가 언마운트될 때 리스너를 정리
+    return () => {
+      window.removeEventListener("message", handleLoginMessage);
+      popup?.close();
+      setPopup(null);
+    };
+  }, []);
 
   const closeModal = (e) => {
     e.stopPropagation();
@@ -121,8 +177,29 @@ function App() {
       }}
     >
       <h1>RandomCloset</h1>
+
+      <div>
+        <button onClick={(e) => handlePopupClick(e, "kakao-t")}>
+          KAKAO 로그인
+        </button>
+        <button onClick={(e) => handlePopupClick(e, "connect/google-t")}>
+          구글 연동
+        </button>
+      </div>
+      <div>
+        <button onClick={(e) => handlePopupClick(e, "google-t")}>
+          GOOGLE 로그인
+        </button>
+        <button onClick={(e) => handlePopupClick(e, "connect/kakao-t")}>
+          카카오 연동
+        </button>
+      </div>
+      <LogoutButton />
+      <div>
+        <a href="https://aws.rcloset.biz/api/v1/auth/logout">logout</a>
+      </div>
+      <div onClick={handleCheckLogin}>ME</div>
       <div
-        // ref={parentRef}
         style={{
           display: "flex",
           flexDirection: "column",
@@ -147,6 +224,32 @@ function App() {
       </div>
       <NavBar parentWidth={width} />
     </div>
+  );
+}
+
+function App() {
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <MainLayout />,
+    },
+    {
+      path: "/login/success",
+      element: <LoginSuccess />,
+    },
+    {
+      path: "/login/fail",
+      element: <LoginFail />,
+    },
+  ]);
+  return (
+    <RouterProvider router={router} />
+    // <Router>
+    //   <Routes>
+    //     <Route path="/" element={<MainLayout />} />
+    //     {/* <Route path="/login/success/*" element={<LoginSuccess />} /> */}
+    //   </Routes>
+    // </Router>
   );
 }
 
